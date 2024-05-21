@@ -1,0 +1,11 @@
+.signup-form {
+    margin: auto;
+    width: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.error-response {
+    color: red;
+}

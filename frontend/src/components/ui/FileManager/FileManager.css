@@ -1,0 +1,28 @@
+.file-manager {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+  
+.file-manager h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+  
+.file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+  
+.file-list .file-item {
+    flex: 1 1 calc(32% - 20px);
+    max-width: calc(32% - 20px);
+    box-sizing: border-box;
+    margin: 10px;
+}

@@ -1,0 +1,55 @@
+.file-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .file-info {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  
+  .file-info h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+  }
+  
+  .file-info p {
+    margin: 5px 0;
+    align-self: start;
+  }
+  
+  .file-actions {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .file-actions button {
+    margin: 5px 5px 0 0;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+  }
+  
+  .file-actions button:hover {
+    background-color: #ddd;
+  }
+  
+  .file-edit input,
+  .file-edit textarea {
+    margin: 5px 0;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  .file-edit button {
+    margin-top: 10px;
+  }

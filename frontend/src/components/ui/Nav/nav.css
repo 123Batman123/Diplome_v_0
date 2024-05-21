@@ -1,0 +1,9 @@
+.nav__items {
+    display: flex;
+    list-style-type:  none;
+}
+
+.nav__item {
+    margin-right: 10px;
+}
+
