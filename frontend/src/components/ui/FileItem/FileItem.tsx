@@ -79,7 +79,7 @@ export const FileItem: React.FC<FileProps> = ({ file }) => {
                 <div className="file-info">
                 <h3>{file.name}</h3>
                 <p>Описание: {file.comment}</p>
-                <p>Размер: {file.size}</p>
+                <p>Размер: {Number(file.size) / 1000000} MB</p>
                 <p>Создан: {new Date(file.data_created * 1000).toLocaleString('ru')}</p>
                 <p>Дата скачивания: {file.date_download ? new Date(file.date_download * 1000).toLocaleString('ru') : 'Нет'}</p>
                 <div className="file-actions">

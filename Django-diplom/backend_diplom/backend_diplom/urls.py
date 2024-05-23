@@ -18,11 +18,15 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 
 from mycloud import views
-from mycloud.views import UserPostList, FileAPIUpdate, FileDownloadView, FilePath, FileAPIDestroy #, index
+from mycloud.views import UserPostList, FileAPIUpdate, FileDownloadView, FileAPIDestroy, \
+    UserListView, UserFileListView, UserDetailView  # , index
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/admin/users/', UserListView.as_view(), name='user-list'),
+    path('api/v1/admin/users/<int:user_id>/files/', UserFileListView.as_view(), name='user-file-list'),
+    path('api/v1/admin/users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
     path('api/v1/filelist/', UserPostList.as_view()),
     path('api/v1/download/<str:hash>/', FileDownloadView.as_view()), # URL для скачивания файла
     path('api/v1/filelist/<int:pk>/', FileAPIUpdate.as_view()),

@@ -26,3 +26,8 @@
     box-sizing: border-box;
     margin: 10px;
 }
+
+.loader {
+    margin: 40px 0;
+}
+

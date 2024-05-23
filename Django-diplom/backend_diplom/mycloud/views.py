@@ -1,8 +1,11 @@
 import os
+import shutil
+
 from django.conf import settings
 
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
 
 from rest_framework import generics, status
 from rest_framework.authentication import TokenAuthentication
@@ -12,7 +15,7 @@ from rest_framework.views import APIView
 
 from backend_diplom.settings import BASE_DIR
 from .models import File
-from .serializers import FileReadSerializer, FileWriteSerializer
+from .serializers import FileReadSerializer, FileWriteSerializer, UserSerializer
 from .utils import seconds_since_epoch
 
 from pathlib import Path
@@ -22,13 +25,46 @@ path_2 = Path(__file__).resolve().parent.parent
 
 # Create your views here.
 
-# class FileAPIView(generics.ListCreateAPIView):
-#     """
-#     Пока не активный, потом можно прикрутить к админу
-#     """
-#     queryset = File.objects.all()
-#     serializer_class = FileSerializer
-#     permission_classes = (IsAuthenticated, )
+class UserListView(generics.ListAPIView):
+    """
+        View для получения всех Пользователей
+    """
+    queryset = User.objects.all().order_by('id')
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser,)
+
+class UserDetailView(APIView):
+    """
+        View для удаления и изменения значения признака «администратор» Пользователя
+    """
+    permission_classes = (IsAdminUser,)
+
+    def delete(self, request, pk, format=None):
+        user = get_object_or_404(User, pk=pk)
+        # Удалить пользователя и его файлы
+        user_directory = os.path.join(settings.MEDIA_ROOT, f'user_{user.id}')
+        if os.path.exists(user_directory):
+            shutil.rmtree(user_directory)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, pk, format=None):
+        user = get_object_or_404(User, pk=pk)
+        user.is_superuser = not user.is_superuser
+        user.save()
+        return Response(status=status.HTTP_200_OK)
+
+class UserFileListView(APIView):
+    """
+        View для получения файлов конкретного Пользователя
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, user_id, format=None):
+        user = get_object_or_404(User, id=user_id)
+        files = File.objects.filter(creator=user)
+        serializer = FileReadSerializer(files, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class FileAPIUpdate(generics.RetrieveUpdateAPIView):
     """
@@ -57,15 +93,6 @@ class FileAPIDestroy(generics.RetrieveDestroyAPIView):
                 os.remove(file_path)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-#TODO ТЕСТОВЫЙ
-class FilePath(APIView):
-    def get(self, request, hash, format=None):
-        print(hash)
-        # queryset = File.objects.all()
-        # a = queryset.filter(hash="2a81017916c1809b98c41d334d07196ed48eb94eded483c22cc3cec6f1c11b921712574583")
-        # print(a.first().file)
-        return Response({"path": "a"})
-
 class FileDownloadView(APIView):
     """
     Класс для отдачи файла по запросу, не зарегистрированного пользователя
@@ -78,7 +105,6 @@ class FileDownloadView(APIView):
         file_name = str(file_obj.name)
         print('name', file_name, 'file_path', file_path)
 
-        # Extract the extension from the file path if it exists
         expansion = file_name.split('.')[-1] if '.' in file_name else ''
         path_file_obj = os.path.join(settings.MEDIA_ROOT, file_path)
 
@@ -103,7 +129,7 @@ class UserPostList(generics.ListCreateAPIView):
     Класс представления для получения данных конкретного пользователя.
     """
     authentication_classes = [TokenAuthentication]
-    permission_classes = (IsAuthenticated, ) #IsAdminUser
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         user = self.request.user
@@ -112,8 +138,8 @@ class UserPostList(generics.ListCreateAPIView):
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return FileReadSerializer  # Сериализатор без поля file
-        return FileWriteSerializer  # Сериализатор с полем file
+            return FileReadSerializer
+        return FileWriteSerializer
 
     def list(self, request, *args, **kwargs):
         user = self.request.user

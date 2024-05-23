@@ -35,24 +35,19 @@ export const FileManager: FC = () => {
     }
 
     if (isLoading) return <div>Загрузка...</div>
-    if (error) {
-        if (error instanceof Error) {
-            return <div>Произошла ошибка: {error.message}</div>
-        }
-        else {
-            return <div>Произошла неизвестная ошибка!</div>
-        } 
-    }
+    if (error instanceof Error) return <div>Произошла ошибка: {error.message}</div>
 
     console.log('files', files, 'error', error, 'isLoading', isLoading)
 
     return (
         <div className="file-manager">
-            <h1>File Manager</h1>
-            <input type="file" onChange={handleFileChange} ref={fileInputRef} />
-            <button onClick={handleUpload} disabled={mutationUpload.isLoading}>
-                {mutationUpload.isLoading ? 'Загрузка...' : 'Загрузить файл'}
-            </button>
+            <h1>Облачное хранилище</h1>
+            <div className="loader">
+                <input type="file" onChange={handleFileChange} ref={fileInputRef} />
+                <button onClick={handleUpload} disabled={mutationUpload.isLoading}>
+                    {mutationUpload.isLoading ? 'Загрузка...' : 'Загрузить файл'}
+                </button>
+            </div>
             <ul className="file-list">
                 {files && files.files.map((file: TypeFile) => (
                     <FileItem key={file.id} file={file} />

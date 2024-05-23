@@ -21,3 +21,13 @@ type TypeFile = {
     comment: string
     hash: string
 }
+
+type TypeUser = {
+    id: number;
+    username: string;
+    email: string;
+    first_name: string;
+    is_superuser: boolean;
+    total_files: number;
+    total_size: number;
+}

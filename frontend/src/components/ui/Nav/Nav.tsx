@@ -27,7 +27,7 @@ export const Nav = () => {
                 </li>
                 {isAdmin && 
                     <li className="nav__item">
-                        <NavLink className={active} to="/" > {/*Добавить переход на админа */}
+                        <NavLink className={active} to="/admin/users" >
                             Admin
                         </NavLink>
                     </li>

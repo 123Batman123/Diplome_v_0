@@ -10,7 +10,6 @@ export const MainPage = () => {
         <>
             {isAuthenticated ?
                 <>
-                    <h1>Main Page</h1>
                     <FileManager />
                 </>
                 :

@@ -44,7 +44,6 @@ export const SignupPage = () => {
     return (
         <>
             <h1>Форма регистрации</h1>
-            {/* <button onClick={handleClick}>Request</button> */}
             {registrationMutation.isLoading ? (
                 <p>Loading...</p>
             )
@@ -109,5 +108,3 @@ export const SignupPage = () => {
         </>
     )
 }
-
-// registrationMutation.error?.response?.data?.username

@@ -16,6 +16,25 @@ const setAuthToken = (token: string | null) => {
   }
 }
 
+export const fetchUsers = async (): Promise<TypeUser[]> => {
+  setAuthToken(localStorage.getItem('token'))
+  const { data } = await axiosInstance.get('/api/v1/admin/users/');
+  return data;
+}
+
+export const deleteUser = async (userId: number) => {
+  await axiosInstance.delete(`/api/v1/admin/users/${userId}/`);
+};
+
+export const toggleAdminStatus = async (userId: number) => {
+  await axiosInstance.patch(`/api/v1/admin/users/${userId}/`);
+};
+
+export const fetchUserFiles = async (userId: string | undefined): Promise<TypeFile[]> => {
+  const { data } = await axiosInstance.get(`/api/v1/admin/users/${userId}/files/`);
+  return data;
+};
+
 export const getLogout = async () => {
   setAuthToken(localStorage.getItem('token'))
   await axiosInstance.post('/auth/token/logout/')
