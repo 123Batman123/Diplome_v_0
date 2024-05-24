@@ -8,12 +8,11 @@ import { AuthProvider } from './context/AuthContext.tsx'
 export const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-      
-    </QueryClientProvider>
-  </BrowserRouter>
+	<BrowserRouter>
+		<QueryClientProvider client={queryClient}>
+			<AuthProvider>
+				<App />
+			</AuthProvider>
+		</QueryClientProvider>
+	</BrowserRouter>
 )

@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'is_superuser', 'total_files', 'total_size')
+        fields = ('id', 'username', 'email', 'first_name', 'is_staff', 'total_files', 'total_size')
 
     def get_total_files(self, obj):
         """

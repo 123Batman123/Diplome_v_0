@@ -50,7 +50,7 @@ class UserDetailView(APIView):
 
     def patch(self, request, pk, format=None):
         user = get_object_or_404(User, pk=pk)
-        user.is_superuser = not user.is_superuser
+        user.is_staff = not user.is_staff
         user.save()
         return Response(status=status.HTTP_200_OK)
 
@@ -146,7 +146,7 @@ class UserPostList(generics.ListCreateAPIView):
         files = self.get_queryset()
         serializer = self.get_serializer(files, many=True)
         data = {
-            'isAdmin': user.is_superuser,
+            'isAdmin': user.is_staff,
             'files': serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)

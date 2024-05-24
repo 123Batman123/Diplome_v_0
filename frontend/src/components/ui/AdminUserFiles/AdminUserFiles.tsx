@@ -1,11 +1,11 @@
-import React from 'react'
+import { FC } from 'react'
 import { useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import { fetchUserFiles } from '../../../services/API'
 import { FileItem } from '../FileItem/FileItem'
 import './AdminUserFiles.css'
 
-export const AdminUserFiles: React.FC = () => {
+export const AdminUserFiles: FC = () => {
     const { userId } = useParams<{ userId: string }>()
     const { data: files, error, isLoading } = useQuery(['userFiles', userId], () => fetchUserFiles(userId))
 

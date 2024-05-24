@@ -1,10 +1,10 @@
-import React from 'react'
+import { FC } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { deleteUser, fetchUsers, toggleAdminStatus } from '../../../services/API'
 import './AdminUserList.css'
 
-export const UserList: React.FC = () => {
+export const UserList: FC = () => {
     const queryClient = useQueryClient()
     const { data: users, error, isLoading } = useQuery('users', fetchUsers)
     const navigate = useNavigate()
@@ -47,12 +47,12 @@ export const UserList: React.FC = () => {
                             <td>{user.username}</td>
                             <td>{user.email}</td>
                             <td>{user.first_name}</td>
-                            <td>{user.is_superuser ? 'Да' : 'Нет'}</td>
+                            <td>{user.is_staff ? 'Да' : 'Нет'}</td>
                             <td>{user.total_files}</td>
                             <td>{(user.total_size / 100000).toFixed(2)} MB</td>
                             <td className='button-conteiner'>
-                                <button className={user.is_superuser ? 'yellow' : ''} onClick={(e) => {e.stopPropagation(); mutationToggleAdmin.mutate(user.id)} }>
-                                    {user.is_superuser ? 'Снять' : 'Назначить'}
+                                <button className={user.is_staff ? 'yellow' : ''} onClick={(e) => {e.stopPropagation(); mutationToggleAdmin.mutate(user.id)} }>
+                                    {user.is_staff ? 'Снять' : 'Назначить'}
                                 </button>
                                 <button className="red" onClick={(e) => { e.stopPropagation(); mutationDelete.mutate(user.id) }}>
                                     Удалить

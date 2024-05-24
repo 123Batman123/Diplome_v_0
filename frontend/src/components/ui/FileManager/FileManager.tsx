@@ -56,10 +56,3 @@ export const FileManager: FC = () => {
         </div>
     )
 }
-
-{/* <li key={file.id}>
-    <div>
-        {file.name}
-        <button>delete</button>
-    </div>
-</li> */}

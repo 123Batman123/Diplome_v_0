@@ -9,45 +9,42 @@ import { axiosInstance } from "../../services/API"
 import { axiosCheckError } from '../../utils/helperFunctions'
 
 import { useAuth } from '../../context/AuthContext'
+import { FC } from "react"
 
-export const LoginPage = () => {
+export const LoginPage: FC = () => {
     const navigate = useNavigate()
-    const {isAuthenticated, setIsAuthenticated, isAdmin, setIsAdmin} = useAuth()
-    console.log('login Page')
+    const {setIsAuthenticated, setIsAdmin} = useAuth()
+    
     const loginMutation = useMutation(
-        async (data: TypeFormValuesLogin) => {
-            console.log('login', data)
-            const res = await axiosInstance.post('/auth/token/login/', data)
-            const postData = res.data
-            console.log('postData', postData)
-            return postData
-        },
-        {
-            onSuccess: (postData) => {
-                localStorage.setItem('isAdmin', JSON.stringify(postData.is_staff))
-                setIsAdmin(postData.is_staff)
-                localStorage.setItem('token', postData.auth_token)
-                setIsAuthenticated(true)
-                
-                navigate('/', {replace: true})
+            async (data: TypeFormValuesLogin) => {
+                console.log('login', data)
+                const res = await axiosInstance.post('/auth/token/login/', data)
+                return res.data
             },
-        }
+            {
+                onSuccess: (postData) => {
+                    console.log(postData)
+                    console.log('до', localStorage.getItem('isAdmin'))
+                    localStorage.setItem('isAdmin', JSON.stringify(postData.is_staff))
+                    console.log('после', localStorage.getItem('isAdmin'))
+                    setIsAdmin(postData.is_staff)
+                    localStorage.setItem('token', postData.auth_token)
+                    setIsAuthenticated(true)
+                    navigate('/', {replace: true})
+                },
+            }
         )
 
     const {
         register,
         handleSubmit,
         reset, 
-        formState: {
-            errors,
-            isValid
-        },
+        formState: { errors, isValid },
     } = useForm<TypeFormValuesLogin>()
 
     const onSubmit = async (data: TypeFormValuesLogin) => {
         try {
-            // reset() ВКЛЮЧИТЬ В ПРОДЕ!!!
-            console.log('mutate',data)
+            reset()
             loginMutation.mutate(data)
         }
         catch (error) {
@@ -55,8 +52,6 @@ export const LoginPage = () => {
         }
     }
 
-    // console.log(data1)
-    // console.log('isAdmin после всего', isAdmin)
     return (
         <>
             <h1>Форма авторизации</h1>
@@ -75,14 +70,12 @@ export const LoginPage = () => {
                     })}/>
                 </label>
                 <div>{errors?.password && <p>{errors?.password?.message || "Error"}</p>}</div>
-                {/* <button onClick={() => console.log(data1)}>Check</button> */}
                 <input className="submit" type="submit" disabled={!isValid}/>
                 {loginMutation.isError && (
-                <div className="error-response">
-                    <p> { axiosCheckError(loginMutation) } </p>
-                </div>
+                    <div className="error-response">
+                        <p> { axiosCheckError(loginMutation) } </p>
+                    </div>
                 )}
-                
             </form>
         </>
     )

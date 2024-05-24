@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { FC, useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import { deleteFile, updateFileInfo } from '../../../services/API'
 
@@ -8,11 +8,11 @@ type FileProps = {
     file: TypeFile
 }
 
-export const FileItem: React.FC<FileProps> = ({ file }) => {
+export const FileItem: FC<FileProps> = ({ file }) => {
     const queryClient = useQueryClient()
-    const [isEditing, setIsEditing] = useState(false)
-    const [newName, setNewName] = useState(file.name)
-    const [newComment, setNewComment] = useState(file.comment)
+    const [isEditing, setIsEditing] = useState<boolean>(false)
+    const [newName, setNewName] = useState<string>(file.name)
+    const [newComment, setNewComment] = useState<string>(file.comment)
 
     const mutationDelete = useMutation(() => deleteFile(file.id), 
         {
