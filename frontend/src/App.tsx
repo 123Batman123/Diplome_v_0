@@ -8,6 +8,11 @@ import { PrivateRoute } from './components/ui/PrivateRoute'
 import { UserList } from './components/ui/AdminUserList/AdminUserList'
 import { AdminUserFiles } from './components/ui/AdminUserFiles/AdminUserFiles'
 
+/**
+ * Главный компонент приложения, который определяет маршрутизацию.
+ * @component
+ * @returns {JSX.Element} Главный компонент приложения.
+ */
 const App = () => {
 
 	return (

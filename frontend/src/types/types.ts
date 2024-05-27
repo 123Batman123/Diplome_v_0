@@ -17,6 +17,14 @@ type TypeFormValuesLogin = {
 }
 
 /**
+ * Тип данных для формы отправки файла.
+ */
+type UploadFileWithCommentData = {
+    file: File
+    comment: string
+}
+
+/**
  * Основной тип данных, описывающий файл.
  */
 type TypeFile = {

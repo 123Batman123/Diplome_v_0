@@ -11,7 +11,7 @@ def user_directory_path(instance, filename):
 
 def seconds_since_epoch():
     """
-        Функция для получения времени в секндах с начала эпохи
+    Функция для получения времени в секндах с начала эпохи
     """
     moscow_tz = pytz.timezone('Europe/Moscow')
     current_time = datetime.now(moscow_tz)
@@ -19,6 +19,6 @@ def seconds_since_epoch():
 
 def generating_uuid():
     """
-        Функция для получения уникального индентификатора
+    Функция для получения уникального индентификатора
     """
     return uuid.uuid1(random.randint(10, 10**12))

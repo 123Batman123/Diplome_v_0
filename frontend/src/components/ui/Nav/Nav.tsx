@@ -5,10 +5,18 @@ import { useAuth } from "../../../context/AuthContext"
 import { getLogout } from "../../../services/API"
 import { FC } from "react"
 
+/**
+ * Компонент навигации.
+ * @component
+ * @returns {JSX.Element} Компонент навигации.
+ */
 export const Nav: FC = () => {
     const active = ({ isActive }: { isActive: boolean }) => isActive ? "nav__link-active" : ""
     const {isAuthenticated, setIsAuthenticated, isAdmin, setIsAdmin} = useAuth()
-
+    /**
+     * Обработчик выхода из системы.
+     * Устанавливает аутентификацию и флаг администратора в false, очищает локальное хранилище и выполняет запрос на выход.
+     */
     const handleLogout = () => {
         setIsAuthenticated(false)
         localStorage.removeItem('token')

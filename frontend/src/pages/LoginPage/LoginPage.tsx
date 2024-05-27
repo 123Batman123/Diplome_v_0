@@ -1,7 +1,5 @@
 import { useForm } from "react-hook-form"
 
-import './LoginPage.css'
-
 import { useNavigate } from "react-router-dom"
 import { useMutation } from "react-query"
 
@@ -10,30 +8,41 @@ import { axiosCheckError } from '../../utils/helperFunctions'
 
 import { useAuth } from '../../context/AuthContext'
 import { FC } from "react"
+import './LoginPage.css'
 
+/**
+ * Компонент страницы входа.
+ * @component
+ * @returns {JSX.Element} JSX элемент для страницы входа.
+ */
 export const LoginPage: FC = () => {
     const navigate = useNavigate()
     const {setIsAuthenticated, setIsAdmin} = useAuth()
     
     const loginMutation = useMutation(
-            async (data: TypeFormValuesLogin) => {
-                console.log('login', data)
-                const res = await axiosInstance.post('/auth/token/login/', data)
-                return res.data
+        /**
+         * Асинхронная функция для отправки данных формы входа на сервер.
+         * @param {FormValues} data - Данные формы входа.
+         * @returns {Promise<any>} Ответ сервера.
+         */
+        async (data: TypeFormValuesLogin) => {
+            console.log('login', data)
+            const res = await axiosInstance.post('/auth/token/login/', data)
+            return res.data
+        },
+        {
+            onSuccess: (postData) => {
+                console.log(postData)
+                console.log('до', localStorage.getItem('isAdmin'))
+                localStorage.setItem('isAdmin', JSON.stringify(postData.is_staff))
+                console.log('после', localStorage.getItem('isAdmin'))
+                setIsAdmin(postData.is_staff)
+                localStorage.setItem('token', postData.auth_token)
+                setIsAuthenticated(true)
+                navigate('/', {replace: true})
             },
-            {
-                onSuccess: (postData) => {
-                    console.log(postData)
-                    console.log('до', localStorage.getItem('isAdmin'))
-                    localStorage.setItem('isAdmin', JSON.stringify(postData.is_staff))
-                    console.log('после', localStorage.getItem('isAdmin'))
-                    setIsAdmin(postData.is_staff)
-                    localStorage.setItem('token', postData.auth_token)
-                    setIsAuthenticated(true)
-                    navigate('/', {replace: true})
-                },
-            }
-        )
+        }
+    )
 
     const {
         register,
@@ -42,6 +51,10 @@ export const LoginPage: FC = () => {
         formState: { errors, isValid },
     } = useForm<TypeFormValuesLogin>()
 
+    /**
+     * Обработчик отправки формы.
+     * @param {FormValues} data - Данные формы входа.
+     */
     const onSubmit = async (data: TypeFormValuesLogin) => {
         try {
             reset()

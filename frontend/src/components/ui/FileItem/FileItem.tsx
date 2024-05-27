@@ -8,11 +8,18 @@ type FileProps = {
     file: TypeFile
 }
 
+/**
+ * Компонент для отображения и управления файлом.
+ * @component
+ * @param {FileProps} props - Свойства компонента.
+ * @param {TypeFile} props.file - Объект файла, содержащий информацию о файле.
+ * @returns {JSX.Element} Компонент элемента файла.
+ */
 export const FileItem: FC<FileProps> = ({ file }) => {
     const queryClient = useQueryClient()
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [newName, setNewName] = useState<string>(file.name)
-    const [newComment, setNewComment] = useState<string>(file.comment)
+    const [newComment, setNewComment] = useState<string>(file.comment ? file.comment : '')
 
     const mutationDelete = useMutation(() => deleteFile(file.id), 
         {
@@ -29,30 +36,48 @@ export const FileItem: FC<FileProps> = ({ file }) => {
                 setIsEditing(false)
             },
         })
-
+    
+    /**
+     * Обработчик удаления файла.
+     */    
     const handleDelete = () => {
         mutationDelete.mutate()
     }
 
+    /**
+     * Обработчик начала редактирования файла.
+     */
     const handleEdit = () => {
         setIsEditing(true)
     }
 
+    /**
+     * Обработчик сохранения изменений файла.
+     */
     const handleSaveEdit = () => {
         mutationUpdate.mutate()
     }
 
+    /**
+     * Обработчик отмены редактирования файла.
+     */
     const handleCancelEdit = () => {
         setIsEditing(false)
         setNewName(file.name)
         setNewComment(file.comment)
     }
 
+    /**
+     * Обработчик скачивания файла.
+     */
     const handleDownload = () => {
         const downloadUrl = `http://127.0.0.1:8000/api/v1/download/${file.hash}`
         window.open(downloadUrl, '_blank')
     }
 
+    /**
+     * Обработчик копирования ссылки на файл.
+     */
     const handleCopyLink = () => {
         const downloadUrl = `http://127.0.0.1:8000/api/v1/download/${file.hash}`
         navigator.clipboard.writeText(downloadUrl)

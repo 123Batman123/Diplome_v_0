@@ -1,16 +1,26 @@
 import { useForm } from "react-hook-form"
 import { useNavigate } from 'react-router-dom'
 
-import './SignupPage.css'
 import { useMutation } from "react-query"
 import { axiosInstance } from "../../services/API"
 import { axiosCheckError } from '../../utils/helperFunctions'
 import { FC } from "react"
+import './SignupPage.css'
 
+/**
+ * Компонент страницы регистрации.
+ * @component
+ * @returns {JSX.Element} JSX элемент для страницы регистрации.
+ */
 export const SignupPage: FC = () => {
     const navigate = useNavigate()
 
     const registrationMutation = useMutation(
+        /**
+         * Асинхронная функция для отправки данных формы регистрации на сервер.
+         * @param {FormValues} data - Данные формы регистрации.
+         * @returns {Promise<any>} Ответ сервера.
+         */
         async (data: TypeFormValuesSignup) => {
             const res = await axiosInstance.post('/api/v1/auth/users/', data)
             return res.data
@@ -31,6 +41,10 @@ export const SignupPage: FC = () => {
         mode: "onChange"
     })
 
+    /**
+     * Обработчик отправки формы.
+     * @param {FormValues} data - Данные формы регистрации.
+     */
     const onSubmit = async (data: TypeFormValuesSignup) => {
         try {
             await registrationMutation.mutateAsync(data)

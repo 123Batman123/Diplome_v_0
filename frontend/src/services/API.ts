@@ -56,7 +56,7 @@ export const toggleAdminStatus = async (userId: number): Promise<void> => {
  * @param userId Идентификатор пользователя.
  * @returns Промис, который разрешается массивом объектов TypeFile.
  */
-export const fetchUserFiles = async (userId: string | undefined): Promise<TypeFile[]> => {
+export const fetchUserFiles = async (userId: string | undefined | number): Promise<TypeFile[]> => {
 	const { data } = await axiosInstance.get(`/api/v1/admin/users/${userId}/files/`)
 	return data
 }
@@ -85,12 +85,14 @@ export const getFiles = async (): Promise<TypeAnswerFileList> => {
 /**
  * Загружает файл на сервер.
  * @param file Файл для загрузки.
+ * @param comment Комментарий пользователя, если он есть.
  * @returns Промис без возвращаемого значения.
  */
-export const uploadFile = async (file: File): Promise<void> => {
+export const uploadFile = async ({file, comment}: UploadFileWithCommentData): Promise<void> => {
 	setAuthToken(localStorage.getItem('token'))
 	const formData = new FormData()
 	formData.append('file', file)
+	formData.append('comment', comment)
 
 	const response = await axiosInstance.post('/api/v1/filelist/', formData, {
 		headers: {

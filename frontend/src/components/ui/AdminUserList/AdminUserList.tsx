@@ -4,6 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { deleteUser, fetchUsers, toggleAdminStatus } from '../../../services/API'
 import './AdminUserList.css'
 
+/**
+ * Компонент для отображения списка пользователей и управления ими.
+ * @component
+ * @returns {JSX.Element} Компонент списка пользователей.
+ */
 export const UserList: FC = () => {
     const queryClient = useQueryClient()
     const { data: users, error, isLoading } = useQuery('users', fetchUsers)
@@ -63,25 +68,5 @@ export const UserList: FC = () => {
                 </tbody>
             </table>
         </div>
-        // <div>
-        //     <h1>Все пользователи</h1>
-        //     <ul className='admin-user-list'>
-        //         {users?.map(user => (
-        //             <li className='user-item' key={user.id}>
-        //                 <p>Ник: {user.username}</p>
-        //                 <p>Email: {user.email}</p>
-        //                 <p>Имя: {user.first_name}</p>
-        //                 <p>Количество файлов: {user.total_files}</p>
-        //                 <p>Размер хранилища: {user.total_size/1000000} Mb</p>
-        //                 <p>Админ: {user.is_superuser? 'Да' : 'Нет'}</p>
-        //                 <Link to={`/admin/users/${user.id}/files`}>Посмотреть файлы</Link>
-        //                 <button onClick={() => mutationDelete.mutate(user.id)}>Удалить пользователя</button>
-        //                 <button onClick={() => mutationToggleAdmin.mutate(user.id)}>
-        //                     {user.is_superuser ? 'Снять Admin' : 'Сделать Admin'}
-        //                 </button>
-        //             </li>
-        //         ))}
-        //     </ul>
-        // </div>
     )
 }

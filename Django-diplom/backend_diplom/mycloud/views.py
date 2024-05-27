@@ -27,7 +27,11 @@ path_2 = Path(__file__).resolve().parent.parent
 
 class UserListView(generics.ListAPIView):
     """
-        View для получения всех Пользователей
+    View для получения всех Пользователей.
+
+    - queryset: все объекты User, отсортированные по id.
+    - serializer_class: UserSerializer.
+    - permission_classes: только администраторы.
     """
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
@@ -35,11 +39,23 @@ class UserListView(generics.ListAPIView):
 
 class UserDetailView(APIView):
     """
-        View для удаления и изменения значения признака «администратор» Пользователя
+    View для удаления и изменения статуса администратора пользователя.
+
+    - permission_classes: только администраторы.
     """
     permission_classes = (IsAdminUser,)
 
     def delete(self, request, pk, format=None):
+        """
+        Удаляет пользователя и его файлы.
+
+        Args:
+            request (HttpRequest): HTTP запрос.
+            pk (int): ID пользователя.
+
+        Returns:
+            Response: HTTP 204 при успешном удалении.
+        """
         user = get_object_or_404(User, pk=pk)
         # Удалить пользователя и его файлы
         user_directory = os.path.join(settings.MEDIA_ROOT, f'user_{user.id}')
@@ -49,6 +65,16 @@ class UserDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, pk, format=None):
+        """
+        Изменяет статус администратора пользователя.
+
+        Args:
+            request (HttpRequest): HTTP запрос.
+            pk (int): ID пользователя.
+
+        Returns:
+            Response: HTTP 200 при успешном изменении статуса.
+        """
         user = get_object_or_404(User, pk=pk)
         user.is_staff = not user.is_staff
         user.save()
@@ -56,11 +82,23 @@ class UserDetailView(APIView):
 
 class UserFileListView(APIView):
     """
-        View для получения файлов конкретного Пользователя
+    View для получения файлов конкретного пользователя.
+
+    - permission_classes: только администраторы.
     """
     permission_classes = [IsAdminUser]
 
     def get(self, request, user_id, format=None):
+        """
+        Получает все файлы указанного пользователя.
+
+        Args:
+            request (HttpRequest): HTTP запрос.
+            user_id (int): ID пользователя.
+
+        Returns:
+            Response: JSON ответ с данными файлов пользователя.
+        """
         user = get_object_or_404(User, id=user_id)
         files = File.objects.filter(creator=user)
         serializer = FileReadSerializer(files, many=True)
@@ -68,7 +106,11 @@ class UserFileListView(APIView):
 
 class FileAPIUpdate(generics.RetrieveUpdateAPIView):
     """
-    Для чтения и обновления
+    View для чтения и обновления файлов.
+
+    - queryset: все объекты File.
+    - serializer_class: FileWriteSerializer.
+    - permission_classes: только аутентифицированные пользователи.
     """
     queryset = File.objects.all()
     serializer_class = FileWriteSerializer
@@ -76,18 +118,28 @@ class FileAPIUpdate(generics.RetrieveUpdateAPIView):
 
 class FileAPIDestroy(generics.RetrieveDestroyAPIView):
     """
-    Для удаления
+    View для удаления файлов.
+
+    - queryset: все объекты File.
+    - serializer_class: FileWriteSerializer.
+    - permission_classes: только аутентифицированные пользователи.
     """
     queryset = File.objects.all()
     serializer_class = FileWriteSerializer
     permission_classes = (IsAuthenticated, )
 
     def perform_destroy(self, instance):
-        # Получаем путь к файлу
+        """
+        Удаляет файл и его запись в базе данных.
+
+        Args:
+            instance (File): объект файла.
+
+        Returns:
+            Response: HTTP 204 при успешном удалении.
+        """
         file_path = instance.file.path
-        # Вызываем базовый метод удаления из базы данных
         super(FileAPIDestroy, self).perform_destroy(instance)
-        # Удаляем связанный файл
         if file_path:
             if os.path.isfile(file_path):
                 os.remove(file_path)
@@ -95,10 +147,22 @@ class FileAPIDestroy(generics.RetrieveDestroyAPIView):
 
 class FileDownloadView(APIView):
     """
-    Класс для отдачи файла по запросу, не зарегистрированного пользователя
+    View для скачивания файла по hash из модели который формируется функцией generating_uuid.
+
+    - permission_classes: доступ для всех.
     """
     permission_classes = [AllowAny]
     def get(self, request, hash, format=None):
+        """
+        Возвращает файл для скачивания по его hash.
+
+        Args:
+            request (HttpRequest): HTTP запрос.
+            hash (str): хеш файла.
+
+        Returns:
+            HttpResponse: файл для скачивания или сообщение об ошибке.
+        """
         file_obj = get_object_or_404(File, hash=hash)
 
         file_path = str(file_obj.file)
@@ -126,22 +190,46 @@ class FileDownloadView(APIView):
 
 class UserPostList(generics.ListCreateAPIView):
     """
-    Класс представления для получения данных конкретного пользователя.
+    View для получения и создания файлов конкретного пользователя.
+
+    - authentication_classes: токеновая аутентификация.
+    - permission_classes: только аутентифицированные пользователи.
     """
     authentication_classes = [TokenAuthentication]
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
+        """
+        Возвращает файлы текущего пользователя, отсортированные по дате создания.
+
+        Returns:
+            QuerySet: файлы пользователя.
+        """
         user = self.request.user
         files = File.objects.filter(creator=user).order_by('-data_created')
         return files
 
     def get_serializer_class(self):
+        """
+        Возвращает сериализатор в зависимости от HTTP метода.
+
+        Returns:
+            Serializer: FileReadSerializer для GET запросов, FileWriteSerializer для других.
+        """
         if self.request.method == 'GET':
             return FileReadSerializer
         return FileWriteSerializer
 
     def list(self, request, *args, **kwargs):
+        """
+        Возвращает данные файлов текущего пользователя и информацию о его статусе.
+
+        Args:
+            request (HttpRequest): HTTP запрос.
+
+        Returns:
+            Response: JSON ответ с данными файлов и статусом пользователя.
+        """
         user = self.request.user
         files = self.get_queryset()
         serializer = self.get_serializer(files, many=True)

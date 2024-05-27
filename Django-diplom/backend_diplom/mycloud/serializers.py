@@ -8,7 +8,10 @@ from .utils import seconds_since_epoch
 
 class UserSerializer(serializers.ModelSerializer):
     """
-        Сериализатор для получения всех пользователей
+    Сериализатор для получения всех пользователей.
+
+    - total_files: количество файлов пользователя.
+    - total_size: общий размер всех файлов пользователя.
     """
     total_files = serializers.SerializerMethodField()
     total_size = serializers.SerializerMethodField()
@@ -19,18 +22,34 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_total_files(self, obj):
         """
-            Колличество файлов
+        Возвращает количество файлов пользователя.
+
+        Args:
+            obj (User): объект пользователя.
+
+        Returns:
+            int: количество файлов пользователя.
         """
         return File.objects.filter(creator=obj).count()
 
     def get_total_size(self, obj):
         """
-            Общий размер всех файлов у Пользовтаеля
+        Возвращает общий размер всех файлов пользователя.
+
+        Args:
+            obj (User): объект пользователя.
+
+        Returns:
+            int: общий размер файлов пользователя.
         """
         return File.objects.filter(creator=obj).aggregate(total_size=Sum('size'))['total_size'] or 0
 
 class FileReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для чтения данных из таблицы File"""
+    """
+    Сериализатор для чтения данных из таблицы File.
+
+    - fields: перечисление полей модели File для чтения.
+    """
     # creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
@@ -38,7 +57,11 @@ class FileReadSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'size', 'data_created', 'date_download', 'comment', 'hash')
 
 class FileWriteSerializer(serializers.ModelSerializer):
-    """Сериализатор для таблицы File"""
+    """
+    Сериализатор для создания и обновления файлов в таблице File.
+
+    - creator: скрытое поле, устанавливающее текущего пользователя.
+    """
     creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
@@ -47,7 +70,13 @@ class FileWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Для автоматического создания поля size и добавления расширения, если его нет
+        Создаёт объект File с автоматическим установлением поля size и добавлением расширения файла, если его нет.
+
+        Args:
+            validated_data (dict): валидированные данные для создания объекта File.
+
+        Returns:
+            File: созданный объект File.
         """
         file = validated_data['file']
         validated_data['size'] = file.size
@@ -59,7 +88,7 @@ class FileWriteSerializer(serializers.ModelSerializer):
             name, extension = name_parts
         else:
             name = name_parts[0]
-            extension = ''  # No extension
+            extension = ''
 
         if not extension:
             extension = 'bin'
@@ -71,6 +100,15 @@ class FileWriteSerializer(serializers.ModelSerializer):
         return super(FileWriteSerializer, self).create(validated_data)
 
     def to_representation(self, instance):
+        """
+        Возвращает представление объекта File, исключая поле file для GET запросов.
+
+        Args:
+            instance (File): объект File.
+
+        Returns:
+            dict: представление объекта File.
+        """
         representation = super().to_representation(instance)
         print(self.context)
         if self.context['request'].method == 'GET':
@@ -79,7 +117,9 @@ class FileWriteSerializer(serializers.ModelSerializer):
 
 class CustomUserCreateSerializer(UserCreateSerializer):
     """
-    Кстомный сериализатор для добавления поля first_name оно же полное имя пользователя
+    Кастомный сериализатор для создания пользователя с добавлением поля first_name.
+
+    - email: обязательное поле email.
     """
     email = serializers.EmailField()
 
@@ -89,13 +129,27 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
     def validate_email(self, value):
         """
-        Валидация на уникальность email в базе данных
+        Проверяет уникальность email в базе данных.
+
+        Args:
+            value (str): email для проверки.
+
+        Returns:
+            str: проверенный email.
+
+        Raises:
+            serializers.ValidationError: если email уже существует.
         """
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Этот email уже используется.")
         return value
 
 class CustomTokenSerializer(TokenSerializer):
+    """
+    Кастомный сериализатор для добавления поля is_staff к токену.
+
+    - is_staff: булево поле, указывающее является ли пользователь администратором.
+    """
     is_staff = serializers.BooleanField(source='user.is_staff')
 
     class Meta(TokenSerializer.Meta):

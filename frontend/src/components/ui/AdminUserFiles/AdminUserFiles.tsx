@@ -5,6 +5,11 @@ import { fetchUserFiles } from '../../../services/API'
 import { FileItem } from '../FileItem/FileItem'
 import './AdminUserFiles.css'
 
+/**
+ * Компонент для отображения файлов конкретного пользователя в административной панели.
+ * @component
+ * @returns {JSX.Element} Компонент файлов пользователя.
+ */
 export const AdminUserFiles: FC = () => {
     const { userId } = useParams<{ userId: string }>()
     const { data: files, error, isLoading } = useQuery(['userFiles', userId], () => fetchUserFiles(userId))
