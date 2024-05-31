@@ -16,7 +16,7 @@ load_dotenv()
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,12 +28,10 @@ SECRET_KEY = 'django-insecure-9j7@6s+11www7bb$#i3c0ua#lx5him=$otfcy7xpk=4!93pkoi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True #TODO <= ТУТ НАСТРОЙКА ДЛЯ СТАТИТКА по умолчанию TRUE
 
-ALLOWED_HOSTS = [] #TODO <= ТУТ НАСТРОЙКА ДЛЯ СТАТИТКА по умолчанию []
+ALLOWED_HOSTS = ['*'] #TODO <= ТУТ НАСТРОЙКА ДЛЯ СТАТИТКА по умолчанию []
 
 # Application definition
 AUTH_USER_MODEL = 'auth.User'
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
 
@@ -52,7 +50,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -63,7 +60,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend_diplom.urls'
@@ -71,7 +67,7 @@ ROOT_URLCONF = 'backend_diplom.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [], #TODO <= ТУТ НАСТРОЙКА ДЛЯ СТАТИТКА # os.path.join(BASE_DIR, 'mycloud', 'frontend', 'html')
+        'DIRS': [os.path.join(BASE_DIR, 'mycloud', 'templates')], #TODO <= ТУТ НАСТРОЙКА ДЛЯ СТАТИТКА
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -136,7 +132,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -161,13 +156,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-# CORS_ORIGIN_ALLOW_ALL: True
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Адрес вашего фронтенда React
-    "http://127.0.0.1:9000",   # Пример другого адреса
-]
-
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
@@ -181,13 +169,10 @@ DJOSER = {
 
 #TODO Все настройки для files static
 
-# print('path_3', os.path.join(BASE_DIR, 'reactapp/static/assets'))
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'mycloud', 'frontend', 'public'),
-#     os.path.join(BASE_DIR, 'mycloud', 'frontend', 'dist')
-# ]
-#
-# INTERNAL_IPS = [
-#     'localhost',
-#     '127.0.0.1'
-# ]
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"

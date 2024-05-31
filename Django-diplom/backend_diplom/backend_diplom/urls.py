@@ -35,5 +35,5 @@ urlpatterns = [
     path('api/v1/auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     #TODO Все настройки для files static
-    # path('test/', views.index, name='index'),
+    re_path(r'^.*$', views.index, name='index'),
 ]

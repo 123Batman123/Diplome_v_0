@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 from django.conf import settings
 
@@ -21,6 +22,8 @@ from .utils import seconds_since_epoch
 from pathlib import Path
 
 from django.utils.encoding import iri_to_uri
+import subprocess
+
 path_2 = Path(__file__).resolve().parent.parent
 
 # Create your views here.
@@ -239,7 +242,18 @@ class UserPostList(generics.ListCreateAPIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
+def handle_requirements():
 
+    print('Выполнения скрипта библиотек')
+    installed_packages = subprocess.check_output([sys.executable, "-m", "pip", "freeze"])
+    installed_packages = installed_packages.decode('utf8').split('\n')
+
+    with open('requirements.txt', 'w') as f:
+        for package in installed_packages:
+            if package and not package.startswith(('-', '#')):
+                f.write(package + '\n')
+
+# handle_requirements()
 #TODO Все настройки для files static
-# def index(request, *args, **kwargs):
-#     return render(request, 'new.html')
+def index(request, *args, **kwargs):
+    return render(request, 'index.html')
