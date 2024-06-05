@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9j7@6s+11www7bb$#i3c0ua#lx5him=$otfcy7xpk=4!93pkoi'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True #TODO <= ТУТ НАСТРОЙКА ДЛЯ СТАТИТКА по умолчанию TRUE
+DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ['*'] #TODO <= ТУТ НАСТРОЙКА ДЛЯ СТАТИТКА по умолчанию []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
 # Application definition
 AUTH_USER_MODEL = 'auth.User'
@@ -128,10 +128,10 @@ WSGI_APPLICATION = 'backend_diplom.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test3',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-        'USER': 'postgres',
+        'NAME': os.getenv('DB_NAME'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+        'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
     }
 }
