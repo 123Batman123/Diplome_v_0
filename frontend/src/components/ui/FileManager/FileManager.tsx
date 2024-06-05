@@ -54,15 +54,12 @@ export const FileManager: FC = () => {
      */
     const handleUpload = () => {
         if (selectedFile) {
-            console.log({file: selectedFile, comment: comment})
             mutationUpload.mutate({file: selectedFile, comment: comment})
         }
     }
 
     if (isLoading) return <div>Загрузка...</div>
     if (error instanceof Error) return <div>Произошла ошибка: {error.message}</div>
-
-    console.log('files', files, 'error', error, 'isLoading', isLoading)
 
     return (
         <div className="file-manager">

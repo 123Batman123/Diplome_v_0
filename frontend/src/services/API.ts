@@ -1,10 +1,12 @@
 import axios, { AxiosInstance } from 'axios'
 
+const baseUrl = import.meta.env.VITE_BASE_URL
+
 /**
  * Экземпляр Axios для взаимодействия с сервером.
  */
 export const axiosInstance: AxiosInstance = axios.create({
-	baseURL: "http://127.0.0.1:8000",
+	baseURL: baseUrl,
 	timeout: 10000,
 	headers: {
 		'Content-Type': 'application/json',
@@ -66,9 +68,7 @@ export const fetchUserFiles = async (userId: string | undefined | number): Promi
  * @returns Промис без возвращаемого значения.
  */
 export const getLogout = async (): Promise<void> => {
-	console.log(localStorage.getItem('token'))
 	setAuthToken(localStorage.getItem('token'))
-	console.log('Выполнено')
 	await axiosInstance.post('/auth/token/logout/')
 }
 

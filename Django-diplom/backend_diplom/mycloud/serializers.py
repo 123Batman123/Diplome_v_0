@@ -110,7 +110,6 @@ class FileWriteSerializer(serializers.ModelSerializer):
             dict: представление объекта File.
         """
         representation = super().to_representation(instance)
-        print(self.context)
         if self.context['request'].method == 'GET':
             representation.pop('file', None)
         return representation

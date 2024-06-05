@@ -4,6 +4,8 @@ import { deleteFile, updateFileInfo } from '../../../services/API'
 
 import './FileItem.css'
 
+const baseUrl = import.meta.env.VITE_BASE_URL
+
 type FileProps = {
     file: TypeFile
 }
@@ -71,7 +73,7 @@ export const FileItem: FC<FileProps> = ({ file }) => {
      * Обработчик скачивания файла.
      */
     const handleDownload = () => {
-        const downloadUrl = `http://127.0.0.1:8000/api/v1/download/${file.hash}`
+        const downloadUrl = `${baseUrl}/api/v1/download/${file.hash}/`
         window.open(downloadUrl, '_blank')
     }
 
@@ -79,7 +81,7 @@ export const FileItem: FC<FileProps> = ({ file }) => {
      * Обработчик копирования ссылки на файл.
      */
     const handleCopyLink = () => {
-        const downloadUrl = `http://127.0.0.1:8000/api/v1/download/${file.hash}`
+        const downloadUrl = `http://127.0.0.1:8000/api/v1/download/${file.hash}/`
         navigator.clipboard.writeText(downloadUrl)
             .then(() => {
                 alert('Link copied to clipboard!')

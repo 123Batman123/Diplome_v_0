@@ -1,6 +1,6 @@
 import os
 import shutil
-import sys
+import logging
 
 from django.conf import settings
 
@@ -14,20 +14,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from backend_diplom.settings import BASE_DIR
 from .models import File
 from .serializers import FileReadSerializer, FileWriteSerializer, UserSerializer
 from .utils import seconds_since_epoch
-
-from pathlib import Path
-
 from django.utils.encoding import iri_to_uri
-import subprocess
 
-path_2 = Path(__file__).resolve().parent.parent
-
-# Create your views here.
-
+logger = logging.getLogger('mycloud')
 class UserListView(generics.ListAPIView):
     """
     View для получения всех Пользователей.
@@ -39,6 +31,10 @@ class UserListView(generics.ListAPIView):
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser,)
+
+    def get(self, request, *args, **kwargs):
+        logger.info('Fetching all users')
+        return super().get(request, *args, **kwargs)
 
 class UserDetailView(APIView):
     """
@@ -60,11 +56,12 @@ class UserDetailView(APIView):
             Response: HTTP 204 при успешном удалении.
         """
         user = get_object_or_404(User, pk=pk)
-        # Удалить пользователя и его файлы
+        logger.info(f'Deleting user {user.id}')
         user_directory = os.path.join(settings.MEDIA_ROOT, f'user_{user.id}')
         if os.path.exists(user_directory):
             shutil.rmtree(user_directory)
         user.delete()
+        logger.info(f'User {pk} deleted successfully')
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, pk, format=None):
@@ -81,6 +78,7 @@ class UserDetailView(APIView):
         user = get_object_or_404(User, pk=pk)
         user.is_staff = not user.is_staff
         user.save()
+        logger.info(f'User {user.id} admin status changed to {user.is_staff}')
         return Response(status=status.HTTP_200_OK)
 
 class UserFileListView(APIView):
@@ -102,9 +100,13 @@ class UserFileListView(APIView):
         Returns:
             Response: JSON ответ с данными файлов пользователя.
         """
+
+    def get(self, request, user_id, format=None):
         user = get_object_or_404(User, id=user_id)
+        logger.info(f'Fetching files for user {user.id}')
         files = File.objects.filter(creator=user)
         serializer = FileReadSerializer(files, many=True)
+        logger.info(f'Retrieved {len(files)} files for user {user.id}')
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class FileAPIUpdate(generics.RetrieveUpdateAPIView):
@@ -118,6 +120,10 @@ class FileAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = File.objects.all()
     serializer_class = FileWriteSerializer
     permission_classes = (IsAuthenticated, )
+
+    def update(self, request, *args, **kwargs):
+        logger.info(f'Updating file {self.get_object().id}')
+        return super().update(request, *args, **kwargs)
 
 class FileAPIDestroy(generics.RetrieveDestroyAPIView):
     """
@@ -141,11 +147,13 @@ class FileAPIDestroy(generics.RetrieveDestroyAPIView):
         Returns:
             Response: HTTP 204 при успешном удалении.
         """
+        file_id = instance.id
         file_path = instance.file.path
         super(FileAPIDestroy, self).perform_destroy(instance)
         if file_path:
             if os.path.isfile(file_path):
                 os.remove(file_path)
+        logger.info(f'Destroyed file {file_id} and removed file from {file_path}')
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class FileDownloadView(APIView):
@@ -154,7 +162,7 @@ class FileDownloadView(APIView):
 
     - permission_classes: доступ для всех.
     """
-    permission_classes = [AllowAny]
+    permission_classes = (AllowAny, )
     def get(self, request, hash, format=None):
         """
         Возвращает файл для скачивания по его hash.
@@ -166,19 +174,20 @@ class FileDownloadView(APIView):
         Returns:
             HttpResponse: файл для скачивания или сообщение об ошибке.
         """
-        file_obj = get_object_or_404(File, hash=hash)
+        try:
+            file_obj = get_object_or_404(File, hash=hash)
+        except Exception as e:
+            return HttpResponse("File not found", status=404)
 
         file_path = str(file_obj.file)
         file_name = str(file_obj.name)
-        print('name', file_name, 'file_path', file_path)
-
+        logger.info(f'Download requested for file: {file_name} with hash: {hash}')
         expansion = file_name.split('.')[-1] if '.' in file_name else ''
         path_file_obj = os.path.join(settings.MEDIA_ROOT, file_path)
-
         if os.path.exists(path_file_obj):
             file_obj.date_download = seconds_since_epoch()
             file_obj.save()
-            print('file_name', file_name, 'expansion', expansion)
+            logger.info(f'File {file_name} found, preparing for download')
             with open(path_file_obj, 'rb') as file:
                 response = HttpResponse(file, content_type='application/force-download')
 
@@ -186,9 +195,10 @@ class FileDownloadView(APIView):
                     file_name += '.bin'
 
                 response['Content-Disposition'] = f'attachment; filename=' + iri_to_uri(file_name)
-
+                logger.info(f'File {file_name} ready for download')
                 return response
         else:
+            logger.error(f'File not found: {path_file_obj}')
             return HttpResponse("File not found", status=404)
 
 class UserPostList(generics.ListCreateAPIView):
@@ -210,6 +220,7 @@ class UserPostList(generics.ListCreateAPIView):
         """
         user = self.request.user
         files = File.objects.filter(creator=user).order_by('-data_created')
+        logger.info(f'Found {len(files)} files for user {user.id}')
         return files
 
     def get_serializer_class(self):
@@ -234,26 +245,18 @@ class UserPostList(generics.ListCreateAPIView):
             Response: JSON ответ с данными файлов и статусом пользователя.
         """
         user = self.request.user
+        logger.info(f'Listing files for user {user.id}')
         files = self.get_queryset()
         serializer = self.get_serializer(files, many=True)
         data = {
             'isAdmin': user.is_staff,
             'files': serializer.data
         }
+        logger.info(f'Listed files for user {user.id}')
         return Response(data, status=status.HTTP_200_OK)
-
-def handle_requirements():
-
-    print('Выполнения скрипта библиотек')
-    installed_packages = subprocess.check_output([sys.executable, "-m", "pip", "freeze"])
-    installed_packages = installed_packages.decode('utf8').split('\n')
-
-    with open('requirements.txt', 'w') as f:
-        for package in installed_packages:
-            if package and not package.startswith(('-', '#')):
-                f.write(package + '\n')
 
 # handle_requirements()
 #TODO Все настройки для files static
 def index(request, *args, **kwargs):
+    logger.info('Rendering index page')
     return render(request, 'index.html')

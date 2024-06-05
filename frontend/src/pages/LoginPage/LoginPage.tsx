@@ -26,16 +26,12 @@ export const LoginPage: FC = () => {
          * @returns {Promise<any>} Ответ сервера.
          */
         async (data: TypeFormValuesLogin) => {
-            console.log('login', data)
             const res = await axiosInstance.post('/auth/token/login/', data)
             return res.data
         },
         {
             onSuccess: (postData) => {
-                console.log(postData)
-                console.log('до', localStorage.getItem('isAdmin'))
                 localStorage.setItem('isAdmin', JSON.stringify(postData.is_staff))
-                console.log('после', localStorage.getItem('isAdmin'))
                 setIsAdmin(postData.is_staff)
                 localStorage.setItem('token', postData.auth_token)
                 setIsAuthenticated(true)
