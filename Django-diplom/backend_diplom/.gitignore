@@ -6,4 +6,4 @@ venv/
 .env
 env/
 debug.log
-backend_diplom/files/
+files/
