@@ -18,7 +18,7 @@
       - **admin.py** - Административная панель для моделей.
       - **apps.py** - Конфигурация приложения.
       - **utils.py** - Вспомогательные функции, используемые в приложении.
-    - **/static/** - Директория со статическими файлами
+    - **/staticfiles/** - Директория со статическими файлами
     - **manage.py** - Управляющий скрипт Django.
     - **README.md** - Инструкци по сборке Django static files бэкенда.
 - **/frontend/** - Папка, содержащая frontend часть проекта.
@@ -96,4 +96,153 @@ sudo systemctl start nginx
 ```
 sudo systemctl status nginx
 ```
-### 13. 
+### 13. Скачаем репозиторий GitHub:
+```
+git clone https_репозитория
+```
+### 14. Перейдем в папку репозитория где лежит manage.py:
+```
+cd название_проекта
+```
+### 15. Создадим БД. 
+Переключимся на пользователя postgres:
+```
+sudo su postgres
+```
+Переключимся на psql
+```
+psql
+```
+Зададим пароль для postgres
+```
+ALTER USER postgres WITH PASSWORD 'ваш_пароль';
+```
+Создадим БД
+```
+CREATE DATABASE diplome_v_0;
+```
+Выйдем из qsql
+```
+\q
+```
+Выходим из под пользователя postgres
+```
+exit
+```
+### 16. Создадим .env на сервере:
+Переходим в директории с Django проектом, там где находится файл manage.py
+```
+nano .env
+```
+Прописываем следующие параметры в файле .env
+```
+DEBUG=True(по умолчанию, потом поменять на False)
+ALLOWED_HOSTS=localhost,127.0.0.1,ваш_ip
+DB_NAME=название_вашей_БД
+DB_HOST=localhost
+DB_PORT=5432 (по умолчанию)
+DB_USER=имя_пользователя
+DB_PASSWORD=пароль_БД
+```
+### 17. Настроим виртуальное окружение:
+В той же директории с manage.py
+```
+python3 -m venv env
+```
+Активировуем виртуальное окружение
+```
+source env/bin/activate
+```
+Утановим необходимые пакеты из requirements.txt
+```
+pip install -r requirements.txt
+```
+Выполним миграции:
+```
+python manage.py migrate
+```
+### 18. Запустим сервер:
+```
+python manage.py runserver 0.0.0.0:8000
+```
+В .env поменять DEBUG на False
+```
+DEBUG=False
+```
+### 19. Настроим gunicorn:
+```
+gunicorn backend_diplom.wsgi -b 0.0.0.0:8000
+```
+Создадим файл настроек gunicorn \
+Переходим:
+```
+sudo nano /etc/systemd/system/gunicorn.service
+```
+Пропишем следующие настройки:
+```
+[Unit]
+Description=gunicorn service
+After=network.target
+
+[Service]
+User=zakhar
+Group=www-data
+WorkingDirectory=/home/zakhar/Diplome_v_0/Django-diplom/backend_diplom
+ExecStart=/home/zakhar/Diplome_v_0/Django-diplom/backend_diplom/env/bin/gunicorn --access-logfile -\
+    --workers 3 --bind unix:/home/zakhar/Diplome_v_0/Django-diplom/backend_diplom/backend_diplom/gunicorn.sock backend_diplom.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+```
+Зупстим:
+```
+sudo systemctl start gunicorn
+```
+```
+sudo systemctl enable gunicorn
+```
+Проверим статус:
+```
+sudo systemctl status gunicorn
+```
+### 20. Настроим nginx:
+Создадим файл с настройками:
+```
+sudo nano /etc/nginx/sites-available/diplom
+```
+Сами настройки:
+```
+server {
+    listen 80;
+    server_name 79.174.80.82;
+
+    location /static/ {
+        root /home/zakhar/Diplome_v_0/Django-diplom/backend_diplom;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/zakhar/Diplome_v_0/Django-diplom/backend_diplom/backend_diplom/gunicorn.sock;
+    }
+}
+```
+Делаем ссылку:
+```
+sudo ln -s /etc/nginx/sites-available/diplom /etc/nginx/sites-enabled
+```
+Остановим сервер:
+```
+sudo systemctl stop nginx
+```
+Запустим сервер:
+```
+sudo systemctl start nginx
+```
+Проверка статуса сервера:
+```
+sudo systemctl status nginx
+```
+### 21. Разрешим файрвол для Nginx:
+```
+sudo ufw allow 'Nginx Full'
+```
