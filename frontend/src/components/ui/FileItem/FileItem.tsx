@@ -81,7 +81,7 @@ export const FileItem: FC<FileProps> = ({ file }) => {
      * Обработчик копирования ссылки на файл.
      */
     const handleCopyLink = () => {
-        const downloadUrl = `http://127.0.0.1:8000/api/v1/download/${file.hash}/`
+        const downloadUrl = `${baseUrl}/api/v1/download/${file.hash}/`
         navigator.clipboard.writeText(downloadUrl)
             .then(() => {
                 alert('Link copied to clipboard!')
