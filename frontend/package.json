@@ -13,6 +13,7 @@
     "@types/react-query": "^1.2.9",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.6.8",
+    "clipboard-polyfill": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.1",

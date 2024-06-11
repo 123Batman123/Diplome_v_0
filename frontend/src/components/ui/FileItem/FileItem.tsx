@@ -1,6 +1,7 @@
 import { FC, useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import { deleteFile, updateFileInfo } from '../../../services/API'
+import * as clipboard from "clipboard-polyfill"
 
 import './FileItem.css'
 
@@ -22,6 +23,7 @@ export const FileItem: FC<FileProps> = ({ file }) => {
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [newName, setNewName] = useState<string>(file.name)
     const [newComment, setNewComment] = useState<string>(file.comment ? file.comment : '')
+    const [linkCopied, setLinkCopied] = useState<boolean>(false)
 
     const mutationDelete = useMutation(() => deleteFile(file.id), 
         {
@@ -82,13 +84,13 @@ export const FileItem: FC<FileProps> = ({ file }) => {
      */
     const handleCopyLink = () => {
         const downloadUrl = `${baseUrl}/api/v1/download/${file.hash}/`
-        navigator.clipboard.writeText(downloadUrl)
-            .then(() => {
-                alert('Link copied to clipboard!')
-            })
-            .catch(() => {
-                alert('Failed to copy link.')
-            })
+        clipboard.writeText(downloadUrl).then(() => {
+            setLinkCopied(true)
+            setTimeout(() => setLinkCopied(false), 1000)
+            console.log('Text copied to clipboard!')
+        }).catch(() => {
+            console.error('Failed to copy text: ')
+        })
     }
 
     return (
@@ -116,6 +118,7 @@ export const FileItem: FC<FileProps> = ({ file }) => {
                     </button>
                     <button onClick={handleDownload}>Скачать</button>
                     <button onClick={handleCopyLink}>Скопировать ссылку</button>
+                    {linkCopied && <span className="copy-message">Ссылка скопирована!</span>}
                 </div>
                 </div>
             )}

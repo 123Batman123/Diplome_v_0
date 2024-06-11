@@ -77,12 +77,12 @@ export const SignupPage: FC = () => {
                     <div className="error">{errors?.username && <p>{errors?.username?.message || "Error"}</p>}</div>
 
                     <label className="label">
-                        FullName:
-                        <input className="input" {...register('fullname', {
+                        Fullname:
+                        <input className="input" {...register('first_name', {
                             required: "Обязательное поле!"
                         })}/>
                     </label>
-                    <div className="error">{errors?.fullname && <p>{errors?.fullname?.message || "Error"}</p>}</div>
+                    <div className="error">{errors?.first_name && <p>{errors?.first_name?.message || "Error"}</p>}</div>
 
                     <label className="label">
                         Email:
