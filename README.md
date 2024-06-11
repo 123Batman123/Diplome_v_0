@@ -119,7 +119,7 @@ ALTER USER postgres WITH PASSWORD 'ваш_пароль';
 ```
 Создадим БД
 ```
-CREATE DATABASE diplome_v_0;
+CREATE DATABASE diplome_v_0; Или ваше название
 ```
 Выйдем из qsql
 ```
