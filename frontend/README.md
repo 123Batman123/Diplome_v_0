@@ -6,7 +6,7 @@
 1. react-hook-form [Документация](https://react-hook-form.com/)
 2. react-query [Документация](https://tanstack.com/query/latest/docs/framework/react/overview)
 3. axios [Документация](https://axios-http.com/ru/docs/intro)
-4. clipboard-polyfill [Документация](https://www.npmjs.com/package/clipboard-polyfill)
+
 
 # Инструкции по сборке и подготовке артефактов фронтенда
 
@@ -27,7 +27,7 @@ npm install
 ## Сборка проекта
 Перед сборкой убедитесь, что у вас в поекте присутствует файл .env:
 ```
-VITE_BASE_URL=http://ваш_домен в моем случае 127.0.0.1:8000
+VITE_BASE_URL=http://ваш_домен в моем случае 89.111.175.233
 ```
 Чтобы собрать проект, используйте следующую команду:
 ```

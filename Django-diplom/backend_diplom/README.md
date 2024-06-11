@@ -20,11 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = '/static/'
 
 # Директория, куда будут собираться все статические файлы
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Директории с исходными статическими файлами сюда помещаем файлы из dist фронтенда
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'staticfiles',
 ]
 ```
 ## Шаг 2: Настройка templates шаблона вашего проекта
