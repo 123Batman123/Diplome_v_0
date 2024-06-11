@@ -161,7 +161,11 @@ pip install -r requirements.txt
 ```
 python manage.py migrate
 ```
-### 18. Запустим сервер:
+### 18. Соберем статические файлы:
+```
+python manage.py collectstatic
+```
+### 19. Запустим сервер:
 ```
 python manage.py runserver 0.0.0.0:8000
 ```
@@ -169,7 +173,7 @@ python manage.py runserver 0.0.0.0:8000
 ```
 DEBUG=False
 ```
-### 19. Настроим gunicorn:
+### 20. Настроим gunicorn:
 ```
 gunicorn backend_diplom.wsgi -b 0.0.0.0:8000
 ```
@@ -205,7 +209,7 @@ sudo systemctl enable gunicorn
 ```
 sudo systemctl status gunicorn
 ```
-### 20. Настроим nginx:
+### 21. Настроим nginx:
 Создадим файл с настройками:
 ```
 sudo nano /etc/nginx/sites-available/diplom
@@ -242,7 +246,18 @@ sudo systemctl start nginx
 ```
 sudo systemctl status nginx
 ```
-### 21. Разрешим файрвол для Nginx:
+Откроем файл настрое nginx:
+```
+sudo systemctl stop nginx
+```
+Поменяем первое поле файла:
+```
+user www-data;
+заменить на 
+user имя_пользователя; В моем случае zakhar
+```
+### 22. Разрешим файрвол для Nginx:
 ```
 sudo ufw allow 'Nginx Full'
 ```
+ 
