@@ -246,9 +246,9 @@ sudo systemctl start nginx
 ```
 sudo systemctl status nginx
 ```
-Откроем файл настрое nginx:
+**Откроем файл настроек nginx:**
 ```
-sudo systemctl stop nginx
+sudo nano /etc/nginx/nginx.conf
 ```
 Поменяем первое поле файла:
 ```
@@ -261,3 +261,21 @@ user имя_пользователя; В моем случае zakhar
 sudo ufw allow 'Nginx Full'
 ```
  
+
+## Особые примечания:
+### Если какие то изменения в проекте:
+Заливаем на сервер:
+```
+git pull
+```
+Не забываем сделать:
+```
+python manage.py collectstatic
+```
+Если в браузере не вступают изменения делаем:
+```
+sudo systemctl restart gunicorn
+```
+```
+sudo systemctl restart nginx
+```
